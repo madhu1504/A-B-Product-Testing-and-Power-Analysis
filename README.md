@@ -341,6 +341,10 @@ check_model(app_rsm, check = "qq")
 
 ![img6](a_files/figure-html/unnamed-chunk-18-1.png)
 
+```r
+# Inspect further via QQ plot
+check_model(app_rsm, check = "qq")
+```
 ![img7](a_files/figure-html/unnamed-chunk-27-3.png)
 
 This Density and QQ-style residual diagnostic suggests normality assumption is largely satisfied, with only mild deviations in the tails.
@@ -355,12 +359,14 @@ random_effects <- ranef(app_rsm)$country
 
 qqnorm(random_effects$"(Intercept)", main = "Q-Q Plot: Random Intercepts")
 qqline(random_effects$"(Intercept)")
-
-qqnorm(random_effects$ms_feat.f1, main = "Q-Q Plot: Random Slopes")
-qqline(random_effects$ms_feat.f1)
 ```
 
 ![img8](a_files/figure-html/unnamed-chunk-25-1.png)
+
+```r
+qqnorm(random_effects$ms_feat.f1, main = "Q-Q Plot: Random Slopes")
+qqline(random_effects$ms_feat.f1)
+```
 
 ![img9](a_files/figure-html/unnamed-chunk-20-4.png)
 
