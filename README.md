@@ -14,13 +14,38 @@ This analysis will apply Linear Mixed Effects Modelling to critically compare a 
 library(tidyverse)
 app <- readr::read_csv("opt1_app.csv")
 head(app)
+```
+
+```
+# A tibble: 6 × 4
+  user     country ms_feat app_use
+  <chr>    <chr>     <dbl>   <dbl>
+1 3fe6fadd UK            0      91
+2 dd0bf80b UK            0      64
+3 938db17c UK            1      82
+4 b0d287be UK            1      78
+5 6ec93501 UK            1      45
+6 8161385a UK            0      87
+```
+
+```r
 length(unique(app$user))
+```
+
+```
+[1] 8572
 ```
 
 It contains 8572 users, their weekly engagement (`app_use` in minutes) and involves separate groups: test (milestones feature; **ms_feat = 1**) and control (regular users; **ms_feat = 0**). The participants belong to:
 
 ```r
 unique(app$country)
+```
+
+```
+ [1] "UK"          "Germany"     "Italy"       "France"      "Netherlands"
+ [6] "Belgium"     "Spain"       "Portugal"    "Greece"      "Austria"
+[11] "Denmark"     "Ireland"
 ```
 
 ### Data Formatting
@@ -60,9 +85,51 @@ options(scipen = 999)
 ```r
 # percentage of users missing in app_use
 mean(is.na(app$app_use)) * 100
+```
 
+```
+[1] 4.701353
+```
+
+```r
 # no of users missing per group
 table(app$country, app$ms_feat, is.na(app$app_use))
+```
+
+```
+, ,  = FALSE
+
+  
+                0   1
+  Austria     301 291
+  Belgium     373 385
+  Denmark     328 347
+  France      382 373
+  Germany     363 359
+  Greece      362 346
+  Ireland     348 340
+  Italy       339 380
+  Netherlands 297 302
+  Portugal    340 341
+  Spain       302 272
+  UK          369 329
+
+, ,  = TRUE
+
+  
+                0   1
+  Austria      15  19
+  Belgium      18  10
+  Denmark      25  22
+  France       17  20
+  Germany      22  19
+  Greece       12  11
+  Ireland      19   9
+  Italy        17  17
+  Netherlands  11  12
+  Portugal     10  21
+  Spain        20  15
+  UK           29  13
 ```
 
 4.7% of app_usage values were missing, accounted for by updated terms and conditions, possibly reflect Missing at Random rather than completely random (MCAR). Given the even, low spread of MAR data and the robustness of mixed-effects models, it reduces concern of substantial bias.
@@ -78,6 +145,24 @@ app %>%
   summarise(mean_use = mean(app_use, na.rm = TRUE), .groups = "drop") %>%
   pivot_wider(names_from = ms_feat, values_from = mean_use) %>%
   rename(Control = `0`, Milestones = `1`)
+```
+
+```
+# A tibble: 12 × 3
+   Country     Control Milestones
+   <fct>         <dbl>      <dbl>
+ 1 Austria        78.9       92.8
+ 2 Belgium        48.5       53.3
+ 3 Denmark        56.4       62.8
+ 4 France         68.4       91.6
+ 5 Germany        60.7       81.2
+ 6 Greece         80.3       86.8
+ 7 Ireland        60.5       66.0
+ 8 Italy          61.4       97.9
+ 9 Netherlands    68.1       75.2
+10 Portugal       81.6       67.2
+11 Spain          82.8      118.
+12 UK             76.9       67.7
 ```
 
 Highest engagement was found in milestone group in Italy and the lowest in control group of Belgium. Mostly engagement is higher for all test groups than control groups, except for Portugal and UK.
@@ -142,7 +227,47 @@ A statistical tool measuring the proportion of total variance explained by clust
 
 ```r
 summary(app_rim)
+```
+
+```
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: app_use ~ ms_feat.f + (1 | country)
+   Data: app
+
+REML criterion at convergence: 67341.4
+
+Scaled residuals:
+    Min      1Q  Median      3Q     Max
+-3.6667 -0.6700 -0.0043  0.6750  3.5722
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ country  (Intercept) 166.6    12.91
+ Residual             220.8    14.86
+Number of obs: 8169, groups:  country, 12
+
+Fixed effects:
+            Estimate Std. Error       df t value             Pr(>|t|)
+(Intercept)   68.813      3.733   11.041   18.43        0.00000000121 ***
+ms_feat.f1    11.162      0.329 8156.028   33.93 < 0.0000000000000002 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Correlation of Fixed Effects:
+           (Intr)
+ms_feat.f1 -0.044
+```
+
+```r
 icc(app_rim)
+```
+
+```
+# Intraclass Correlation Coefficient
+
+    Adjusted ICC: 0.430
+  Unadjusted ICC: 0.398
 ```
 
 **Interpretation**
@@ -224,10 +349,48 @@ app_rsm <- lmer(app_use ~ 1 + ms_feat.f + (1 + ms_feat.f | country), data = app)
 summary(app_rsm)
 ```
 
+```
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: app_use ~ 1 + ms_feat.f + (1 + ms_feat.f | country)
+   Data: app
+
+REML criterion at convergence: 65088.2
+
+Scaled residuals:
+    Min      1Q  Median      3Q     Max
+-3.5784 -0.6685  0.0128  0.6699  4.0475
+
+Random effects:
+ Groups   Name        Variance Std.Dev. Corr
+ country  (Intercept) 128.2    11.32
+          ms_feat.f1  239.3    15.47    -0.11
+ Residual             166.3    12.90
+Number of obs: 8169, groups:  country, 12
+
+Fixed effects:
+            Estimate Std. Error     df t value      Pr(>|t|)
+(Intercept)   68.698      3.275 11.001  20.979 0.00000000032 ***
+ms_feat.f1    11.311      4.475 10.999   2.528        0.0281 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Correlation of Fixed Effects:
+           (Intr)
+ms_feat.f1 -0.113
+```
+
 **ICC**
 
 ```r
 icc(app_rsm)
+```
+
+```
+# Intraclass Correlation Coefficient
+
+    Adjusted ICC: 0.578
+  Unadjusted ICC: 0.535
 ```
 
 **Interpretation**
@@ -314,6 +477,22 @@ Likelihood ratio-test (LRT) can help product analysts make a confident decision 
 anova(app_rim, app_rsm)
 ```
 
+```
+refitting model(s) with ML (instead of REML)
+```
+
+```
+Data: app
+Models:
+app_rim: app_use ~ ms_feat.f + (1 | country)
+app_rsm: app_use ~ 1 + ms_feat.f + (1 + ms_feat.f | country)
+        npar   AIC   BIC logLik -2*log(L)  Chisq Df            Pr(>Chisq)
+app_rim    4 67353 67381 -33673     67345
+app_rsm    6 65109 65151 -32549     65097 2248.3  2 < 0.00000000000000022 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
 RISM is considered the better fit because it has much lower AIC (65109 vs 67353), much higher log-likelihood and is highly significant LRT (χ² = 2248.3, p < 0.001).
 
 ---
@@ -334,9 +513,6 @@ The reference line is mostly flat, showing a minor deviation at the tail. Howeve
 
 ```r
 check_model(app_rsm, check = "normality")
-
-# Inspect further via QQ plot
-check_model(app_rsm, check = "qq")
 ```
 
 ![img6](a_files/figure-html/unnamed-chunk-18-1.png)
@@ -345,6 +521,7 @@ check_model(app_rsm, check = "qq")
 # Inspect further via QQ plot
 check_model(app_rsm, check = "qq")
 ```
+
 ![img7](a_files/figure-html/unnamed-chunk-27-3.png)
 
 This Density and QQ-style residual diagnostic suggests normality assumption is largely satisfied, with only mild deviations in the tails.
@@ -415,7 +592,28 @@ sim_power1 <- sim_results1 %>%
   group_by(n_ppts) %>%
   summarise(power = mean(p_val < .05))
 sim_power1
+```
 
+```
+# A tibble: 13 × 2
+   n_ppts power
+    <dbl> <dbl>
+ 1    100 0.458
+ 2    190 0.613
+ 3    280 0.676
+ 4    370 0.737
+ 5    460 0.77
+ 6    550 0.793
+ 7    640 0.823
+ 8    730 0.835
+ 9    820 0.869
+10    910 0.887
+11   1000 0.9
+12   1090 0.908
+13   1180 0.938
+```
+
+```r
 # Quantifying the convergence and singular-fit issues
 fail_count <- 0
 total_models <- 1000
@@ -426,9 +624,19 @@ model_try <- try(
 if (class(model_try) == "try-error") {
   fail_count <- fail_count + 1}
 fail_count
+```
 
+```
+[1] 1
+```
+
+```r
 # proportion: showing zero model fails
 fail_count / total_models
+```
+
+```
+[1] 0.001
 ```
 
 ```r
