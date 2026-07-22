@@ -679,8 +679,6 @@ Power analysis revealed that larger samples of 1000 is required to account for s
 
 Furthermore, engagement was recorded only for the first week. This means the findings cannot reflect whether engagement is sustained or if some regions are slower/faster to accept new features in the market. To conclude a mixed effects model capturing longitudinal data over a few months and includes more clusters to evaluate feature-effect on engagement can enable the product analyst to plan even reliable and effective localised strategies.
 
-**Word Count excluding main headings:** 1500
-
 ---
 
 ## References
