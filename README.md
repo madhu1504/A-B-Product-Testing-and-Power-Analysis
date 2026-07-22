@@ -196,7 +196,7 @@ options(repr.plot.width = 40, repr.plot.height = 10)
 finalrim_figure
 ```
 
-![img2](a_files/images/img2)
+![img2](a_files/figure-html/unnamed-chunk-10-1.png)
 
 Figures, revealed that Spain has the highest positive deviation from global intercept and Belgium showing the highest negative deviation.
 
@@ -277,7 +277,7 @@ options(repr.plot.width = 18, repr.plot.height = 8)
 finalrsm_figure
 ```
 
-![img3](a_files/images/img3)
+![img3](a_files/figure-html/unnamed-chunk-14-1.png)
 
 **Spaghetti plot**
 
@@ -299,7 +299,7 @@ ggplot(app_fitrs, aes(x = ms_feat.f, y = app_use, color = country)) +
         plot.subtitle = element_text(size = 10))
 ```
 
-![img4](a_files/images/img4)
+![img4](a_files/figure-html/unnamed-chunk-15-1.png)
 
 Figure 4 depicts that Spain and Portugal have the highest weekly engagement for control groups, however based on Figure 5, Spain shows the highest positive-effect in engagement while Portugal shows a negative one. Reflecting that higher intercept doesn't determine greater positive-effect of milestones.
 
@@ -326,7 +326,7 @@ RISM is considered the better fit because it has much lower AIC (65109 vs 67353)
 (check_model(app_rsm, check = "linearity"))
 ```
 
-![img5](a_files/images/img5)
+![img5](a_files/figure-html/unnamed-chunk-17-1.png)
 
 The reference line is mostly flat, showing a minor deviation at the tail. However there are no visible U/S curves. Furthermore, the vertical spread of the individual residual points is highly uniform across all vertical strips. Hence the assumption of linearity is mostly met and Homoscedasticity is sufficiently satisfied.
 
@@ -339,9 +339,9 @@ check_model(app_rsm, check = "normality")
 check_model(app_rsm, check = "qq")
 ```
 
-![img6](a_files/images/img6)
+![img6](a_files/figure-html/unnamed-chunk-18-1.png)
 
-![img7](a_files/images/img7)
+![img7](a_files/figure-html/unnamed-chunk-27-3.png)
 
 This Density and QQ-style residual diagnostic suggests normality assumption is largely satisfied, with only mild deviations in the tails.
 
@@ -360,9 +360,9 @@ qqnorm(random_effects$ms_feat.f1, main = "Q-Q Plot: Random Slopes")
 qqline(random_effects$ms_feat.f1)
 ```
 
-![img8](a_files/images/img8)
+![img8](a_files/figure-html/unnamed-chunk-25-1.png)
 
-![img9](a_files/images/img9)
+![img9](a_files/figure-html/unnamed-chunk-20-4.png)
 
 For a sample of just 12 clusters, both plots are stable, with no heavy skews or highly tailed outliers. Thereby normality of intercepts and slopes is reasonably satisfied.
 
@@ -443,7 +443,7 @@ ggplot(sim_power1, aes(x = n_ppts, y = power)) +
   coord_cartesian(clip = "off")
 ```
 
-![img10](a_files/images/img10)
+![img10](a_files/figure-html/unnamed-chunk-21-1.png)
 
 ### Interpretation
 
